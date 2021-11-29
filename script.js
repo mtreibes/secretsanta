@@ -1,8 +1,11 @@
 let table = document.getElementById("table");
 let body = document.getElementsByTagName('body')[0];
 var pairs = {};
+var tempNames = [];
 var nameArray = [];
-
+var keys = {};
+var newPairs = {};
+var counter = 0;
 
 document.getElementById("field").addEventListener("keyup", function(e) {
         if (e.key === 'Enter') {
@@ -13,27 +16,37 @@ document.getElementById("field").addEventListener("keyup", function(e) {
 function addRow(){
 
     if (document.getElementById("field").value !== ""){
-
-        let row = table.insertRow(-1);
-        let cell1 = row.insertCell(0);
-
-        let text = document.createTextNode(document.getElementById("field").value);
-
-        cell1.appendChild(text);
-        document.getElementById("field").value = "";    
         
-        let cell2 = row.insertCell(1);
-        let deleteBtn = document.createElement("INPUT");
-        deleteBtn.innerHTML = "Delete";
-        deleteBtn.setAttribute("type", "button");
-        deleteBtn.setAttribute("value", "Delete");
-        deleteBtn.setAttribute("onclick", "removeRow(this)");
-        cell2.appendChild(deleteBtn);
+        let textField = document.getElementById("field").value;
 
+        if (!tempNames.includes(textField)){
+            tempNames.push(textField);
+
+            let row = table.insertRow(-1);
+            let cell1 = row.insertCell(0);
+
+            let text = document.createTextNode(textField);
+    
+            cell1.appendChild(text);
+            document.getElementById("field").value = "";    
+            
+            let cell2 = row.insertCell(1);
+            let deleteBtn = document.createElement("INPUT");
+            deleteBtn.innerHTML = "Delete";
+            deleteBtn.setAttribute("type", "button");
+            deleteBtn.setAttribute("value", "Delete");
+            deleteBtn.setAttribute("onclick", "removeRow(this)");
+            cell2.appendChild(deleteBtn);
+        }
+        else{
+            document.getElementById("field").value = "";
+            alert("Name already exists here.");
+        }
 
     }
     else{
         document.getElementById("field").value = "";
+        alert("Please enter a name.");
     }
 
 }
@@ -45,7 +58,6 @@ function removeRow(table){
 
 
 function randomize(){
-
 
     for (let row of table.rows) 
     {
@@ -63,7 +75,15 @@ function randomize(){
 
     console.log(pairs);
 
-    display();
+    newPairs = shufflePairs(pairs);
+
+    console.log(newPairs);
+
+    keys = Object.keys(newPairs);
+
+    document.body.innerHTML = '';
+
+    displayHelper();
 
 }
 
@@ -99,30 +119,58 @@ function shufflePairs(obj){
   return newObj;
 }
 
-
-function display(){
+function displayHelper(){
 
     document.body.innerHTML = '';
-    var table = document.createElement('table');
-    var tbdy = document.createElement('tbody');
 
-    newPairs = shufflePairs(pairs);
+    console.log(keys[counter]);
+    console.log(newPairs[keys[counter]]);
 
-    var keys = Object.keys(newPairs);
+    var mainCont = document.createElement('div');
+    mainCont.setAttribute('class', 'mainCont');
+    document.body.appendChild(mainCont);
 
-    for (var i = 0; i < Object.keys(newPairs).length; ++i){
-        var row = document.createElement('tr');
-        var td = document.createElement('td');
-        td.appendChild(document.createTextNode(keys[i]));
-        var td1 = document.createElement('td');
-        td1.appendChild(document.createTextNode(newPairs[keys[i]]));
-        row.appendChild(td);
-        row.appendChild(td1);
-        tbdy.appendChild(row);
-        table.appendChild(tbdy);
+    var hold = document.createElement('div');
+    hold.textContent = "Hold to see your selection:";
+    hold.setAttribute('class', 'hold');
+    mainCont.appendChild(hold);
 
+    var theBody = document.createElement('div');
+    theBody.setAttribute('class', 'theBody');
+    mainCont.appendChild(theBody);
+
+    var front = document.createElement('div');
+    front.textContent = keys[counter];
+    front.setAttribute('class', 'front');
+    theBody.appendChild(front);
+
+    var back = document.createElement('div');
+    back.textContent = newPairs[keys[counter]];
+    back.setAttribute('class', 'back');
+    theBody.appendChild(back);
+
+    let next = document.createElement('input');
+    next.innerHTML = "Next";
+    next.setAttribute("type", "button");
+
+    var nextName = "";
+
+    if (counter+1 < nameArray.length){
+        nextName = `Next up: ${keys[counter+1]}`
     }
+    else{
+        nextName = "Done";
+    }
+    
+    next.setAttribute("value", nextName);
+    next.setAttribute("onclick", "displayHelper()");
+    mainCont.appendChild(next);
 
-    body.appendChild(table);
+    if (counter < nameArray.length){
+        counter++;
+    }
+    else{
+        location.reload();
+    }
 
 }
