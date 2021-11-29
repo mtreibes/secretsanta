@@ -1,2 +1,0 @@
-# secretsanta
-Secret Santa Generator
